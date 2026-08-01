@@ -13,13 +13,15 @@ Standard commands for the root web app live in `README.md` and `package.json` sc
 
 ### Runtime / tooling
 
-- `.tool-versions` pins Node `20.15.1` / pnpm `9.4.0`, but the cloud VM's default Node is v22, which satisfies `engines` (`>=18.18.0`). Install, lint, typecheck, test, build, and the dev server all work on Node 22 — no Node switch is required. If you hit a Node-version-specific issue, switch with `nvm use 20.15.1`. pnpm `9.4.0` is already available on the VM (the update script runs `pnpm install`).
+- Use **Node 20.19.4** (provisioned via `nvm`, and preferred automatically in interactive shells via `~/.bashrc`). The web app pins `nodejs 20.15.1` in `.tool-versions`, but the mobile app (`react-native@0.86.2`) requires `^20.19.4`, so 20.19.4 is the single version that satisfies both — do **not** use `nvm use 20.15.1`, it does not satisfy the mobile app.
+- The base image's default `node` (a bare Node 22 binary at `/exec-daemon`) has **no `npm` and no `pnpm`**. If a shell resolves to it, run `nvm use 20.19.4`. `pnpm@9.4.0` is provided through `corepack` (already activated); the web app uses **pnpm**, the mobile app uses **npm**. The environment update script provisions this toolchain and installs both apps' deps.
 
 ### Running the apps (dev)
 
 - **Web**: `pnpm run dev` serves the Remix/Vite app on port **5173**. This is the way to run/test end to end (README notes HTTP streaming is unreliable under the `wrangler pages dev` `start`/`preview` flow).
   - On first page load Vite pre-bundles deps and the browser can show transient `504 (Outdated Optimize Dep)` errors that leave the page non-interactive. Fix: hard-reload the page after Vite finishes optimizing. If it persists, stop the server, delete `node_modules/.vite`, and restart `pnpm run dev`.
-- **Mobile**: `mobile/` is **not** part of a pnpm workspace (there is no root `pnpm-workspace.yaml`), so the root `pnpm install` and the update script do **not** install it — install its deps separately from inside `mobile/` (`npm install`). Then from `mobile/`: `npm run web` serves the Expo web build on port **8081** (first bundle can take 20-40s), and `npm run start` opens the Expo dev menu (i/a/w for iOS/Android/web). It is independent of the root web app and is not covered by the root CI/CD workflow.
+  - `pnpm run dev` and `pnpm test` print noisy `tsconfig-paths` parse errors about `mobile/tsconfig.json` (it extends `expo/tsconfig.base`, which is not installed at the repo root). These are non-fatal warnings — the server and tests still work.
+- **Mobile**: `mobile/` is **not** part of a pnpm workspace (there is no root `pnpm-workspace.yaml`), so the root `pnpm install` does not install it; its deps are installed separately with `npm install` (the environment update script does this via `npm --prefix mobile install`). From `mobile/`: `npm run web` serves the Expo web build on port **8081** (first bundle can take 20-40s), and `npm run start` opens the Expo dev menu (i/a/w for iOS/Android/web). It is independent of the root web app and is not covered by the root CI/CD workflow.
 
 ### Required secret for the web AI feature
 
@@ -33,7 +35,7 @@ Standard commands for the root web app live in `README.md` and `package.json` sc
 
 ### Known pre-existing lint errors (not an environment problem)
 
-- `pnpm run lint` currently reports pre-existing errors (the lint tooling itself works; these are codebase issues, not setup issues): `'IconButton' is defined but never used` in `app/components/sidebar/Menu.client.tsx`, plus numerous errors across `mobile/**` and one in `tsconfig.json`. ESLint is **intentionally disabled in CI** (`.github/workflows/ci.yaml` has the ESLint step commented out), so treat `pnpm run lint` as informational.
+- `pnpm run lint` currently reports pre-existing errors (the lint tooling itself works; these are codebase issues, not setup issues): numerous errors across `mobile/**` and one in `tsconfig.json`, plus any others in the web app. ESLint is **intentionally disabled in CI** (`.github/workflows/ci.yaml` has the ESLint step commented out), so treat `pnpm run lint` as informational.
 
 ### CI checks
 
