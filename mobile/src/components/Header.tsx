@@ -6,20 +6,46 @@ import { useChatStore } from '../store/chatStore';
 import { useTheme } from '../theme/ThemeContext';
 import { BoltWordmark } from './BoltLogo';
 
+function PaneButton({
+  active,
+  disabled,
+  icon,
+  label,
+  onPress,
+}: {
+  active: boolean;
+  disabled?: boolean;
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  onPress: () => void;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active, disabled: !!disabled }}
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: active ? theme.itemBackgroundAccent : 'transparent',
+        opacity: disabled ? 0.4 : 1,
+      }}
+    >
+      <Ionicons name={icon} size={16} color={active ? theme.itemContentAccent : theme.textTertiary} />
+    </Pressable>
+  );
+}
+
 export function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const {
-    chatStarted,
-    description,
-    showChat,
-    showWorkbench,
-    setSidebarOpen,
-    setShowChat,
-    setShowWorkbench,
-  } = useChatStore();
+  const { chatStarted, description, activePane, setActivePane, previewHtml, files, setSidebarOpen } = useChatStore();
 
-  const canHideChat = showWorkbench || !showChat;
+  const hasProject = files.length > 0 || !!previewHtml;
 
   return (
     <View
@@ -74,43 +100,28 @@ export function Header() {
               overflow: 'hidden',
             }}
           >
-            <Pressable
-              disabled={!canHideChat}
-              onPress={() => {
-                setShowChat(true);
-                setShowWorkbench(false);
-              }}
-              style={{
-                paddingHorizontal: 10,
-                paddingVertical: 8,
-                backgroundColor: showChat ? theme.itemBackgroundAccent : 'transparent',
-                opacity: !canHideChat ? 0.4 : 1,
-              }}
-            >
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={16}
-                color={showChat ? theme.itemContentAccent : theme.textTertiary}
-              />
-            </Pressable>
+            <PaneButton
+              active={activePane === 'chat'}
+              icon="chatbubble-ellipses-outline"
+              label="Chat"
+              onPress={() => setActivePane('chat')}
+            />
             <View style={{ width: 1, backgroundColor: theme.borderColor }} />
-            <Pressable
-              onPress={() => {
-                setShowWorkbench(true);
-                setShowChat(false);
-              }}
-              style={{
-                paddingHorizontal: 10,
-                paddingVertical: 8,
-                backgroundColor: showWorkbench && !showChat ? theme.itemBackgroundAccent : 'transparent',
-              }}
-            >
-              <Ionicons
-                name="code-slash"
-                size={16}
-                color={showWorkbench && !showChat ? theme.itemContentAccent : theme.textTertiary}
-              />
-            </Pressable>
+            <PaneButton
+              active={activePane === 'code'}
+              disabled={!hasProject}
+              icon="code-slash"
+              label="Code"
+              onPress={() => setActivePane('code')}
+            />
+            <View style={{ width: 1, backgroundColor: theme.borderColor }} />
+            <PaneButton
+              active={activePane === 'preview'}
+              disabled={!hasProject}
+              icon="phone-portrait-outline"
+              label="Preview mode"
+              onPress={() => setActivePane('preview')}
+            />
           </View>
         ) : (
           <View style={{ width: 40 }} />
