@@ -13,6 +13,10 @@ export function HomeScreen() {
   const { theme } = useTheme();
   const { chatStarted, showChat, showWorkbench } = useChatStore();
 
+  // On mobile, prefer a single full-screen surface at a time.
+  const showingWorkbench = chatStarted && showWorkbench && !showChat;
+  const showingChat = !showingWorkbench;
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.backgroundDepth1 }}>
       <Header />
@@ -24,8 +28,8 @@ export function HomeScreen() {
         keyboardVerticalOffset={0}
       >
         <View style={{ flex: 1 }}>
-          {showChat && (
-            <View style={{ flex: showWorkbench && chatStarted ? 0.48 : 1 }}>
+          {showingChat && (
+            <View style={{ flex: 1 }}>
               {!chatStarted ? (
                 <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
                   <View style={{ marginTop: -40 }}>
@@ -66,8 +70,8 @@ export function HomeScreen() {
             </View>
           )}
 
-          {showWorkbench && chatStarted && (
-            <View style={{ flex: showChat ? 0.52 : 1 }}>
+          {showingWorkbench && (
+            <View style={{ flex: 1 }}>
               <Workbench />
             </View>
           )}

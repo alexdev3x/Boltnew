@@ -77,7 +77,8 @@ export function Header() {
             <Pressable
               disabled={!canHideChat}
               onPress={() => {
-                if (canHideChat) setShowChat(!showChat);
+                setShowChat(true);
+                setShowWorkbench(false);
               }}
               style={{
                 paddingHorizontal: 10,
@@ -95,19 +96,19 @@ export function Header() {
             <View style={{ width: 1, backgroundColor: theme.borderColor }} />
             <Pressable
               onPress={() => {
-                if (showWorkbench && !showChat) setShowChat(true);
-                setShowWorkbench(!showWorkbench);
+                setShowWorkbench(true);
+                setShowChat(false);
               }}
               style={{
                 paddingHorizontal: 10,
                 paddingVertical: 8,
-                backgroundColor: showWorkbench ? theme.itemBackgroundAccent : 'transparent',
+                backgroundColor: showWorkbench && !showChat ? theme.itemBackgroundAccent : 'transparent',
               }}
             >
               <Ionicons
                 name="code-slash"
                 size={16}
-                color={showWorkbench ? theme.itemContentAccent : theme.textTertiary}
+                color={showWorkbench && !showChat ? theme.itemContentAccent : theme.textTertiary}
               />
             </Pressable>
           </View>

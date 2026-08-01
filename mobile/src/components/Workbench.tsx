@@ -1,10 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useChatStore } from '../store/chatStore';
 import { useTheme } from '../theme/ThemeContext';
 import { Slider } from './Slider';
+
+function PreviewFrame({ html, backgroundColor }: { html: string; backgroundColor: string }) {
+  if (Platform.OS === 'web') {
+    const IFrame = 'iframe' as unknown as React.ElementType;
+    return (
+      <View style={{ flex: 1, backgroundColor }}>
+        <IFrame
+          title="Bolt preview"
+          srcDoc={html}
+          style={{ border: 'none', width: '100%', height: '100%', backgroundColor }}
+        />
+      </View>
+    );
+  }
+
+  return (
+    <WebView
+      originWhitelist={['*']}
+      source={{ html }}
+      style={{ flex: 1, backgroundColor }}
+    />
+  );
+}
 
 export function Workbench() {
   const { theme } = useTheme();
@@ -58,8 +81,8 @@ export function Workbench() {
         <View style={{ flex: 1 }} />
         <Pressable
           onPress={() => {
-            setShowWorkbench(false);
             setShowChat(true);
+            setShowWorkbench(false);
           }}
           hitSlop={10}
         >
@@ -154,11 +177,7 @@ export function Workbench() {
             </Text>
           </View>
           {previewHtml ? (
-            <WebView
-              originWhitelist={['*']}
-              source={{ html: previewHtml }}
-              style={{ flex: 1, backgroundColor: theme.backgroundDepth1 }}
-            />
+            <PreviewFrame html={previewHtml} backgroundColor={theme.backgroundDepth1} />
           ) : (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ color: theme.textTertiary }}>Preview will appear once Bolt finishes scaffolding.</Text>

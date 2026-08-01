@@ -428,6 +428,8 @@ The project is ready in the workbench. Switch between **Code** and **Preview** t
         setPreviewHtml(PREVIEW_HTML);
         setSelectedFile(EXAMPLE_APP_FILES[0].path);
         setSelectedView('preview');
+        setShowChat(false);
+        setShowWorkbench(true);
         setIsStreaming(false);
         setStreamTimer(null);
 

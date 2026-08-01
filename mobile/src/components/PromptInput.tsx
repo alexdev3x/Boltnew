@@ -27,11 +27,6 @@ export function PromptInput() {
           backgroundColor: theme.promptBackground,
           borderRadius: 12,
           overflow: 'hidden',
-          shadowColor: '#000',
-          shadowOpacity: 0.08,
-          shadowRadius: 8,
-          shadowOffset: { width: 0, height: 2 },
-          elevation: 2,
         }}
       >
         <View style={{ position: 'relative' }}>
