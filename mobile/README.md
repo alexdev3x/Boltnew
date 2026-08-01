@@ -8,7 +8,8 @@ Exact Bolt.new experience from this repository, rebuilt as a React Native (Expo)
 - Prompt box with enhance + send/stop controls
 - Example prompts from the web app
 - Chat transcript UI
-- Mobile workbench with **Code** / **Preview** tabs
+- Code workbench for editing generated files
+- **Preview mode** with a phone-frame device preview, reload control, and address bar
 - History sidebar, delete confirmation, and light/dark theme toggle
 - Local chat persistence on device
 
