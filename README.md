@@ -4,6 +4,16 @@
 
 Bolt.new is an AI-powered web development agent that allows you to prompt, run, edit, and deploy full-stack applications directly from your browser—no local setup required. If you're here to build your own AI-powered web dev agent using the Bolt open source codebase, [click here to get started!](./CONTRIBUTING.md)
 
+## Mobile App
+
+An Expo React Native port of this exact Bolt.new UI lives in [`mobile/`](./mobile). It keeps the same branding, chat flow, example prompts, workbench (Code/Preview), history sidebar, and theme switching — optimized for phones.
+
+```bash
+cd mobile
+npm install
+npm run start
+```
+
 ## What Makes Bolt.new Different
 
 Claude, v0, etc are incredible- but you can't install packages, run backends or edit code. That’s where Bolt.new stands out:

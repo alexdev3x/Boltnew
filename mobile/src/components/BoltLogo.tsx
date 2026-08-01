@@ -1,0 +1,38 @@
+import React from 'react';
+import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
+import { Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { useTheme } from '../theme/ThemeContext';
+
+export function BoltMark({ size = 28 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size * (83 / 95)} viewBox="0 0 95 83" fill="none">
+      <Defs>
+        <LinearGradient id="boltGrad" x1="47.5" y1="0" x2="47.5" y2="82.409" gradientUnits="userSpaceOnUse">
+          <Stop stopColor="#2B5CFF" />
+          <Stop offset="1" stopColor="#1A3799" />
+        </LinearGradient>
+      </Defs>
+      <Path
+        fill="url(#boltGrad)"
+        d="M66.657 0H28.343a7.948 7.948 0 0 0-6.887 3.979L2.288 37.235a7.948 7.948 0 0 0 0 7.938L21.456 78.43a7.948 7.948 0 0 0 6.887 3.979h38.314a7.948 7.948 0 0 0 6.886-3.98l19.17-33.256a7.948 7.948 0 0 0 0-7.938L73.542 3.98A7.948 7.948 0 0 0 66.657 0Z"
+      />
+      <Path
+        fill="#fff"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M50.642 59.608c-3.468 0-6.873-1.261-8.827-3.973l-.69 3.198-12.729 6.762 1.374-6.762 9.27-42.04h11.35l-3.279 14.818c2.649-2.9 5.108-3.973 8.26-3.973 6.81 0 11.35 4.477 11.35 12.675 0 8.45-5.233 19.295-16.079 19.295Zm4.351-16.9c0 3.91-2.774 6.874-6.368 6.874-2.018 0-3.847-.757-5.045-2.08l1.766-7.757c1.324-1.324 2.837-2.08 4.603-2.08 2.711 0 5.044 2.017 5.044 5.044Z"
+      />
+    </Svg>
+  );
+}
+
+export function BoltWordmark({ style }: { style?: StyleProp<ViewStyle> }) {
+  const { theme } = useTheme();
+
+  return (
+    <View style={[{ flexDirection: 'row', alignItems: 'center', gap: 8 }, style]}>
+      <BoltMark size={22} />
+      <Text style={{ color: theme.accent, fontSize: 22, fontWeight: '700', letterSpacing: -0.4 }}>Bolt</Text>
+    </View>
+  );
+}
