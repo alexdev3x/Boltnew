@@ -70,26 +70,34 @@ export function Sidebar() {
                     {items.map((item) => {
                       const active = item.id === activeChatId;
                       return (
-                        <Pressable
+                        <View
                           key={item.id}
-                          onPress={() => loadChat(item.id)}
                           style={{
                             flexDirection: 'row',
                             alignItems: 'center',
                             gap: 8,
-                            paddingHorizontal: 10,
-                            paddingVertical: 10,
                             borderRadius: 8,
                             backgroundColor: active ? theme.itemBackgroundActive : 'transparent',
                           }}
                         >
-                          <Text style={{ flex: 1, color: theme.textPrimary }} numberOfLines={1}>
-                            {item.description}
-                          </Text>
-                          <Pressable onPress={() => setPendingDeleteId(item.id)} hitSlop={8}>
+                          <Pressable
+                            onPress={() => loadChat(item.id)}
+                            style={{ flex: 1, paddingHorizontal: 10, paddingVertical: 10 }}
+                          >
+                            <Text style={{ color: theme.textPrimary }} numberOfLines={1}>
+                              {item.description}
+                            </Text>
+                          </Pressable>
+                          <Pressable
+                            onPress={() => setPendingDeleteId(item.id)}
+                            hitSlop={8}
+                            style={{ paddingHorizontal: 10, paddingVertical: 10 }}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Delete ${item.description}`}
+                          >
                             <Ionicons name="trash-outline" size={16} color={theme.textTertiary} />
                           </Pressable>
-                        </Pressable>
+                        </View>
                       );
                     })}
                   </View>

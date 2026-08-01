@@ -119,7 +119,7 @@ export function PromptInput() {
           </Pressable>
 
           {input.length > 3 ? (
-            <Text style={{ color: theme.textTertiary, fontSize: 11 }}>Return to send · new line in editor</Text>
+            <Text style={{ color: theme.textTertiary, fontSize: 11 }}>Tap ↑ to send</Text>
           ) : null}
         </View>
       </View>
