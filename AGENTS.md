@@ -2,9 +2,9 @@
 
 ## Cursor Cloud specific instructions
 
-This is **Bolt** — the open-source core of [bolt.new](https://bolt.new): a Remix + Vite single-page app (React 18, UnoCSS) whose core feature is an AI agent that generates/edits full-stack apps and runs them in the browser via StackBlitz WebContainers. It is a single-package pnpm project (no monorepo, no Docker, no external DB — chat history is stored client-side in IndexedDB).
+This is **Bolt** — the open-source core of [bolt.new](https://bolt.new): a Remix + Vite single-page app (React 18, UnoCSS) whose core feature is an AI agent that generates/edits full-stack apps and runs them in the browser via StackBlitz WebContainers. The primary web app lives at the repo root (no Docker, no external DB — chat history is stored client-side in IndexedDB). A separate Expo/React Native app lives under `mobile/` (see below).
 
-Standard commands live in `README.md` and `package.json` scripts (`dev`, `build`, `lint`, `typecheck`, `test`, `start`, `preview`). Prefer those; notes below are only the non-obvious caveats.
+Standard commands for the root web app live in `README.md` and `package.json` scripts (`dev`, `build`, `lint`, `typecheck`, `test`, `start`, `preview`). Prefer those; notes below are only the non-obvious caveats.
 
 ### Runtime / tooling
 - `.tool-versions` pins Node `20.15.1` / pnpm `9.4.0`, but the cloud VM's default Node is v22, which satisfies `engines` (`>=18.18.0`). Install, lint, typecheck, test, build, and the dev server all work on Node 22 — no Node switch is required. pnpm `9.4.0` is already available on the VM (the update script runs `pnpm install`).
@@ -20,5 +20,11 @@ Standard commands live in `README.md` and `package.json` scripts (`dev`, `build`
 ### WebContainers
 - Generated apps run **client-side** in the browser via `@webcontainer/api` (loaded from StackBlitz at runtime; no key needed for local dev). The preview pane may sit on a loading spinner until a WebContainer boots, and it needs a real browser with cross-origin isolation — it will not work via headless `curl`.
 
+### Mobile app (`mobile/`)
+- `mobile/` is a standalone **Expo / React Native** app (`bolt-mobile`) with its own `package.json`. It is **not** part of a pnpm workspace (there is no root `pnpm-workspace.yaml`), so the root `pnpm install` and the update script do not install it — install its deps separately from inside `mobile/` (`npm install` / `pnpm install` there) before running `expo start`. It is independent of the root web app and is not covered by the root CI/CD workflow.
+
 ### Known pre-existing issue (not an environment problem)
 - `pnpm run lint` reports one pre-existing error on `main`: `'IconButton' is defined but never used` in `app/components/sidebar/Menu.client.tsx`. The lint tooling itself works; this is a codebase issue, not a setup issue.
+
+### CI checks
+- Two checks run on PRs (see `.github/workflows/`): **CI/CD / Test** (`setup-and-build` → `pnpm run typecheck` → `pnpm run test`; ESLint is intentionally commented out) and **Semantic Pull Request / Validate PR Title**. The latter enforces Conventional Commits on the *PR title*: it must start with a type prefix (`fix`, `feat`, `chore`, `build`, `ci`, `perf`, `docs`, `refactor`, `revert`, `test`) and the subject must not start with an uppercase letter (`subjectPattern: ^(?![A-Z]).+$`).
