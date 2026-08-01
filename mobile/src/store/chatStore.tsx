@@ -24,6 +24,8 @@ export type ChatHistoryItem = {
   previewHtml: string;
 };
 
+export type AppPane = 'chat' | 'code' | 'preview';
+
 type ChatStoreValue = {
   chats: ChatHistoryItem[];
   activeChatId: string | null;
@@ -33,9 +35,7 @@ type ChatStoreValue = {
   input: string;
   chatStarted: boolean;
   isStreaming: boolean;
-  showChat: boolean;
-  showWorkbench: boolean;
-  selectedView: 'code' | 'preview';
+  activePane: AppPane;
   selectedFile: string | null;
   enhancingPrompt: boolean;
   promptEnhanced: boolean;
@@ -43,9 +43,7 @@ type ChatStoreValue = {
   description: string;
   setInput: (value: string) => void;
   setSidebarOpen: (open: boolean) => void;
-  setShowChat: (show: boolean) => void;
-  setShowWorkbench: (show: boolean) => void;
-  setSelectedView: (view: 'code' | 'preview') => void;
+  setActivePane: (pane: AppPane) => void;
   setSelectedFile: (path: string | null) => void;
   startNewChat: () => void;
   loadChat: (id: string) => void;
@@ -275,9 +273,7 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
   const [input, setInput] = useState('');
   const [chatStarted, setChatStarted] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [showChat, setShowChat] = useState(true);
-  const [showWorkbench, setShowWorkbench] = useState(false);
-  const [selectedView, setSelectedView] = useState<'code' | 'preview'>('code');
+  const [activePane, setActivePane] = useState<AppPane>('chat');
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [enhancingPrompt, setEnhancingPrompt] = useState(false);
   const [promptEnhanced, setPromptEnhanced] = useState(false);
@@ -314,9 +310,7 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
     setInput('');
     setChatStarted(false);
     setIsStreaming(false);
-    setShowChat(true);
-    setShowWorkbench(false);
-    setSelectedView('code');
+    setActivePane('chat');
     setSelectedFile(null);
     setPromptEnhanced(false);
     setDescription('');
@@ -332,12 +326,10 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
       setFiles(chat.files);
       setPreviewHtml(chat.previewHtml);
       setChatStarted(true);
-      setShowWorkbench(chat.files.length > 0);
       setSelectedFile(chat.files[0]?.path ?? null);
-      setSelectedView(chat.previewHtml ? 'preview' : 'code');
       setDescription(chat.description);
       setSidebarOpen(false);
-      setShowChat(true);
+      setActivePane(chat.previewHtml ? 'preview' : 'chat');
     },
     [chats],
   );
@@ -393,20 +385,19 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
       setActiveChatId(chatId);
       setDescription(chatDescription);
       setMessages(nextMessages);
-      setShowWorkbench(true);
-      setSelectedView('code');
+      setActivePane('chat');
 
       const assistantId = createId();
       const fullReply = `I'll create that for you.
 
 **Bolt Artifact**
 - Scaffold a React Native todo app
-- Add interactive preview
-- Open the workbench so you can edit code on mobile
+- Add interactive device preview
+- Open Preview mode so you can try the app on a phone frame
 
 Your prompt: "${messageText}"
 
-The project is ready in the workbench. Switch between **Code** and **Preview** to iterate.`;
+The project is ready. Use **Code** to edit files or **Preview** for device preview mode.`;
 
       setMessages((current) => [...current, { id: assistantId, role: 'assistant', content: '' }]);
 
@@ -427,9 +418,7 @@ The project is ready in the workbench. Switch between **Code** and **Preview** t
         setFiles(EXAMPLE_APP_FILES);
         setPreviewHtml(PREVIEW_HTML);
         setSelectedFile(EXAMPLE_APP_FILES[0].path);
-        setSelectedView('preview');
-        setShowChat(false);
-        setShowWorkbench(true);
+        setActivePane('preview');
         setIsStreaming(false);
         setStreamTimer(null);
 
@@ -465,9 +454,7 @@ The project is ready in the workbench. Switch between **Code** and **Preview** t
       input,
       chatStarted,
       isStreaming,
-      showChat,
-      showWorkbench,
-      selectedView,
+      activePane,
       selectedFile,
       enhancingPrompt,
       promptEnhanced,
@@ -475,9 +462,7 @@ The project is ready in the workbench. Switch between **Code** and **Preview** t
       description,
       setInput,
       setSidebarOpen,
-      setShowChat,
-      setShowWorkbench,
-      setSelectedView,
+      setActivePane,
       setSelectedFile,
       startNewChat,
       loadChat,
@@ -496,9 +481,7 @@ The project is ready in the workbench. Switch between **Code** and **Preview** t
       input,
       chatStarted,
       isStreaming,
-      showChat,
-      showWorkbench,
-      selectedView,
+      activePane,
       selectedFile,
       enhancingPrompt,
       promptEnhanced,
