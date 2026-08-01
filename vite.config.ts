@@ -75,6 +75,12 @@ function nodeDevContextPlugin() {
             const response = await handler(request, loadContext as any);
             await sendWebResponse(nodeRes, response);
           } catch (error) {
+            // The client aborting mid-stream surfaces here as a closed
+            // controller/premature-close; that is expected and not an app error.
+            if (isAbortError(error)) {
+              return;
+            }
+
             next(error);
           }
         });
@@ -141,6 +147,19 @@ async function sendWebResponse(nodeRes: any, response: Response): Promise<void> 
   } else {
     nodeRes.end();
   }
+}
+
+function isAbortError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.name === 'AbortError' ||
+    (error as NodeJS.ErrnoException).code === 'ERR_INVALID_STATE' ||
+    (error as NodeJS.ErrnoException).code === 'ERR_STREAM_PREMATURE_CLOSE' ||
+    error.message.includes('Controller is already closed')
+  );
 }
 
 function chrome129IssuePlugin() {
