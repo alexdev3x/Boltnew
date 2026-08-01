@@ -43,9 +43,9 @@ function PaneButton({
 export function Header() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const { chatStarted, description, activePane, setActivePane, previewHtml, files, setSidebarOpen } = useChatStore();
+  const { chatStarted, description, activePane, setActivePane, files, setSidebarOpen } = useChatStore();
 
-  const hasProject = files.length > 0 || !!previewHtml;
+  const hasProject = files.length > 0;
 
   return (
     <View

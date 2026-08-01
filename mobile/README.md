@@ -29,4 +29,13 @@ Then press:
 
 ## Notes
 
-This mobile client mirrors the Bolt.new product UI from the open-source repo. Scaffolding responses and preview HTML run on-device so the app works without WebContainers (which require a desktop Chromium environment). Point `sendMessage` at your own `/api/chat` backend if you want live LLM responses.
+This mobile client mirrors the Bolt.new product UI from the open-source repo. Scaffolding responses run on-device so the app works without WebContainers (which require a desktop Chromium environment). Point `sendMessage` at your own `/api/chat` backend if you want live LLM responses.
+
+### How the device preview works
+
+Preview mode doesn't just show a canned screenshot — it actually compiles and runs the generated project's files:
+
+- `src/utils/generatePreviewHtml.ts` builds a self-contained HTML document containing every `.tsx`/`.ts`/`.jsx`/`.js` file from the workbench, plus a tiny in-browser CommonJS module loader, a Babel (TypeScript + JSX) transpiler, and a minimal `react-native` → DOM shim (`View`, `Text`, `TextInput`, `Pressable`, `ScrollView`, `FlatList`, `Image`, `StyleSheet`, etc).
+- The document is handed to `react-native-webview` (on-device) or an `<iframe>` (on web) and transpiles/executes the entry file (`App.tsx` by convention) live, so edits made in the Code pane show up in Preview after a short debounce.
+- React, ReactDOM, and Babel standalone are bundled into `src/utils/vendor/*.ts` ahead of time (`node scripts/generate-preview-vendor.js`) so the preview never needs network access to a CDN — it works fully offline. Re-run that script after bumping the `react`/`react-dom` dependency versions.
+- Compile or runtime errors in the previewed app are caught and rendered inline instead of leaving a blank screen.

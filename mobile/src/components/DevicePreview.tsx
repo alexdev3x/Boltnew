@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { useChatStore } from '../store/chatStore';
 import { useTheme } from '../theme/ThemeContext';
+import { buildPreviewDocument } from '../utils/generatePreviewHtml';
 
 const PREVIEW_BASE_URL = 'https://preview.bolt.mobile/app';
 
@@ -44,10 +45,18 @@ function PreviewFrame({
 export function DevicePreview() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const { previewHtml, setActivePane, description } = useChatStore();
+  const { files, setActivePane, description } = useChatStore();
   const [url, setUrl] = useState(PREVIEW_BASE_URL);
   const [committedUrl, setCommittedUrl] = useState(PREVIEW_BASE_URL);
   const [reloadKey, setReloadKey] = useState(0);
+  const [debouncedFiles, setDebouncedFiles] = useState(files);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedFiles(files), 400);
+    return () => clearTimeout(timer);
+  }, [files]);
+
+  const previewHtml = useMemo(() => buildPreviewDocument(debouncedFiles), [debouncedFiles]);
 
   const canNavigate = useMemo(() => {
     if (url === PREVIEW_BASE_URL) return true;
