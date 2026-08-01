@@ -1,5 +1,6 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { DevicePreview } from '../components/DevicePreview';
 import { ExamplePrompts } from '../components/ExamplePrompts';
 import { Header } from '../components/Header';
 import { Messages } from '../components/Messages';
@@ -11,11 +12,7 @@ import { useTheme } from '../theme/ThemeContext';
 
 export function HomeScreen() {
   const { theme } = useTheme();
-  const { chatStarted, showChat, showWorkbench } = useChatStore();
-
-  // On mobile, prefer a single full-screen surface at a time.
-  const showingWorkbench = chatStarted && showWorkbench && !showChat;
-  const showingChat = !showingWorkbench;
+  const { chatStarted, activePane } = useChatStore();
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.backgroundDepth1 }}>
@@ -28,7 +25,7 @@ export function HomeScreen() {
         keyboardVerticalOffset={0}
       >
         <View style={{ flex: 1 }}>
-          {showingChat && (
+          {activePane === 'chat' && (
             <View style={{ flex: 1 }}>
               {!chatStarted ? (
                 <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
@@ -70,9 +67,15 @@ export function HomeScreen() {
             </View>
           )}
 
-          {showingWorkbench && (
+          {activePane === 'code' && chatStarted && (
             <View style={{ flex: 1 }}>
               <Workbench />
+            </View>
+          )}
+
+          {activePane === 'preview' && chatStarted && (
+            <View style={{ flex: 1 }}>
+              <DevicePreview />
             </View>
           )}
         </View>
