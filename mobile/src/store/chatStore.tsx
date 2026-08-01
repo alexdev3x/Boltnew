@@ -286,20 +286,26 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
   const [streamTimer, setStreamTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem(HISTORY_KEY).then((raw) => {
-      if (!raw) return;
-      try {
-        const parsed = JSON.parse(raw) as ChatHistoryItem[];
-        setChats(parsed);
-      } catch {
-        // ignore corrupt storage
-      }
-    });
+    AsyncStorage.getItem(HISTORY_KEY)
+      .then((raw) => {
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw) as ChatHistoryItem[];
+          setChats(parsed);
+        } catch {
+          // ignore corrupt storage
+        }
+      })
+      .catch(() => {
+        // Keep an empty history when storage is unavailable.
+      });
   }, []);
 
   const persistChats = useCallback((next: ChatHistoryItem[]) => {
     setChats(next);
-    void AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+    AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next)).catch(() => {
+      // Ignore persistence failures; in-memory chat state still updates.
+    });
   }, []);
 
   const startNewChat = useCallback(() => {

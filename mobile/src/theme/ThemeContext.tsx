@@ -26,12 +26,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           setThemeNameState(stored);
         }
       })
+      .catch(() => {
+        // Keep the system/default theme when storage is unavailable.
+      })
       .finally(() => setReady(true));
   }, []);
 
   const setThemeName = (name: ThemeName) => {
     setThemeNameState(name);
-    void AsyncStorage.setItem(STORAGE_KEY, name);
+    AsyncStorage.setItem(STORAGE_KEY, name).catch(() => {
+      // Ignore persistence failures; in-memory theme still updates.
+    });
   };
 
   const value = useMemo<ThemeContextValue>(
