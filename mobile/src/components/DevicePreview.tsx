@@ -10,21 +10,24 @@ const PREVIEW_BASE_URL = 'https://preview.bolt.mobile/app';
 
 function PreviewFrame({
   html,
+  url,
   backgroundColor,
   reloadKey,
 }: {
   html: string;
+  url: string;
   backgroundColor: string;
   reloadKey: number;
 }) {
   if (Platform.OS === 'web') {
     const IFrame = 'iframe' as unknown as React.ElementType;
+    const srcDoc = html.includes('<head>') ? html.replace('<head>', `<head><base href="${url}">`) : html;
     return (
       <View style={{ flex: 1, backgroundColor }}>
         <IFrame
-          key={reloadKey}
+          key={`${reloadKey}-${url}`}
           title="Bolt device preview"
-          srcDoc={html}
+          srcDoc={srcDoc}
           style={{ border: 'none', width: '100%', height: '100%', backgroundColor }}
         />
       </View>
@@ -33,9 +36,9 @@ function PreviewFrame({
 
   return (
     <WebView
-      key={reloadKey}
+      key={`${reloadKey}-${url}`}
       originWhitelist={['*']}
-      source={{ html }}
+      source={{ html, baseUrl: url }}
       style={{ flex: 1, backgroundColor }}
     />
   );
@@ -171,6 +174,7 @@ export function DevicePreview() {
             {previewHtml ? (
               <PreviewFrame
                 html={previewHtml}
+                url={committedUrl}
                 backgroundColor={theme.backgroundDepth1}
                 reloadKey={reloadKey}
               />
