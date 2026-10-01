@@ -14,6 +14,14 @@ npm install
 npm run start
 ```
 
+## iOS App (SwiftUI)
+
+A native SwiftUI port lives in [`ios/`](./ios). Open `ios/Bolt.xcodeproj` in Xcode 15+ and run on an iPhone simulator or device.
+
+```bash
+open ios/Bolt.xcodeproj
+```
+
 ## What Makes Bolt.new Different
 
 Claude, v0, etc are incredible- but you can't install packages, run backends or edit code. That’s where Bolt.new stands out:
