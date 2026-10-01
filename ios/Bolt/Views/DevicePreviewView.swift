@@ -156,6 +156,16 @@ struct HTMLWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        guard context.coordinator.lastHtml != html else { return }
+        context.coordinator.lastHtml = html
         webView.loadHTMLString(html, baseURL: URL(string: "https://preview.bolt.mobile"))
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    final class Coordinator {
+        var lastHtml: String?
     }
 }

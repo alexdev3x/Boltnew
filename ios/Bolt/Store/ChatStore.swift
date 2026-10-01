@@ -19,6 +19,7 @@ final class ChatStore: ObservableObject {
     @Published var descriptionText = ""
 
     private var streamTask: Task<Void, Never>?
+    private var enhanceTask: Task<Void, Never>?
     private static let historyKey = "bolt_mobile_chats"
 
     init() {
@@ -36,6 +37,7 @@ final class ChatStore: ObservableObject {
     func startNewChat() {
         streamTask?.cancel()
         streamTask = nil
+        cancelEnhanceTask()
         activeChatId = nil
         messages = []
         files = []
@@ -52,6 +54,10 @@ final class ChatStore: ObservableObject {
 
     func loadChat(_ id: String) {
         guard let chat = chats.first(where: { $0.id == id }) else { return }
+        streamTask?.cancel()
+        streamTask = nil
+        isStreaming = false
+        cancelEnhanceTask()
         activeChatId = chat.id
         messages = chat.messages
         files = chat.files
@@ -75,12 +81,19 @@ final class ChatStore: ObservableObject {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !enhancingPrompt else { return }
         enhancingPrompt = true
-        Task {
+        enhanceTask = Task {
             try? await Task.sleep(nanoseconds: 900_000_000)
+            guard !Task.isCancelled else { return }
             input = "Build a polished mobile-friendly version of: \(trimmed). Use SwiftUI with clear hierarchy and a working interactive preview."
             promptEnhanced = true
             enhancingPrompt = false
         }
+    }
+
+    private func cancelEnhanceTask() {
+        enhanceTask?.cancel()
+        enhanceTask = nil
+        enhancingPrompt = false
     }
 
     func stopStreaming() {
@@ -103,6 +116,7 @@ final class ChatStore: ObservableObject {
         let chatId = activeChatId ?? Self.makeId()
         let chatDescription = descriptionText.isEmpty ? Self.summarize(messageText) : descriptionText
 
+        cancelEnhanceTask()
         input = ""
         promptEnhanced = false
         chatStarted = true
@@ -140,6 +154,8 @@ final class ChatStore: ObservableObject {
                 }
                 try? await Task.sleep(nanoseconds: 40_000_000)
             }
+
+            guard !Task.isCancelled else { return }
 
             files = SampleProject.files
             previewHtml = SampleProject.previewHTML
